@@ -592,13 +592,13 @@ export const RightAIChatPanel: React.FC<Props> = ({
   };
 
   const renderGridPopup = (title: string, items: LauncherItem[], withSearch = false) => (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-[calc(100vw-24px)] max-w-xs max-h-72 flex flex-col rounded-2xl bg-gray-900/95 text-white shadow-2xl border border-gray-700 p-2.5 z-50 backdrop-blur-sm">
-      <div className="flex items-center justify-between px-1 pb-1.5 mb-2 border-b border-gray-700">
-        <span className="text-xs font-bold text-gray-200 truncate">{title}</span>
+    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-[calc(100vw-20px)] max-w-xs max-h-64 flex flex-col rounded-2xl bg-gray-900/95 text-white shadow-2xl border border-gray-700 p-2 z-50 backdrop-blur-sm">
+      <div className="flex items-center justify-between px-1 pb-1 mb-1.5 border-b border-gray-700">
+        <span className="text-[11px] font-bold text-gray-200 truncate">{title}</span>
         <button
           type="button"
           onClick={() => setOpenLauncher('none')}
-          className="text-xs text-gray-400 hover:text-white px-1.5 py-0.5 rounded shrink-0"
+          className="text-xs text-gray-400 hover:text-white px-1 py-0.5 rounded shrink-0"
           aria-label="閉じる"
         >
           ✕
@@ -611,11 +611,11 @@ export const RightAIChatPanel: React.FC<Props> = ({
           value={googleSearch}
           onChange={(e) => setGoogleSearch(e.target.value)}
           placeholder="サービス名で検索..."
-          className="w-full mb-2 px-2 py-1 rounded-lg bg-gray-800 border border-gray-700 text-[16px] text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
+          className="w-full mb-1.5 px-2 py-1 rounded-lg bg-gray-800 border border-gray-700 text-[16px] text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
         />
       )}
 
-      <div className="grid grid-cols-3 gap-1.5 overflow-auto touch-auto pr-0.5">
+      <div className="grid grid-cols-3 gap-1 overflow-auto touch-auto pr-0.5">
         {items.length > 0 ? (
           items.map((item) => (
             <a
@@ -624,10 +624,10 @@ export const RightAIChatPanel: React.FC<Props> = ({
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setOpenLauncher('none')}
-              className="flex flex-col items-center justify-center p-1.5 rounded-xl hover:bg-white/10 transition text-center min-w-0"
+              className="flex flex-col items-center justify-center p-1 rounded-xl hover:bg-white/10 transition text-center min-w-0"
             >
               <span
-                className={`w-9 h-9 flex items-center justify-center rounded-full text-base mb-1 shrink-0 ${item.color}`}
+                className={`w-8 h-8 flex items-center justify-center rounded-full text-sm mb-0.5 shrink-0 ${item.color}`}
               >
                 {item.icon}
               </span>
@@ -637,7 +637,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
             </a>
           ))
         ) : (
-          <div className="col-span-3 py-6 text-center text-xs text-gray-400">
+          <div className="col-span-3 py-5 text-center text-xs text-gray-400">
             一致するサービスがありません
           </div>
         )}
@@ -654,26 +654,26 @@ export const RightAIChatPanel: React.FC<Props> = ({
   ];
 
   const presetCategoryTabs: { id: PresetCategory; label: string; activeClass: string }[] = [
-    { id: 'work', label: '💼 お仕事 (6)', activeClass: 'bg-emerald-600 text-white shadow-sm' },
-    { id: 'life', label: '🏡 家事・子育て (6)', activeClass: 'bg-amber-500 text-white shadow-sm' },
-    { id: 'care', label: '🌿 整理・息抜き (6)', activeClass: 'bg-sky-600 text-white shadow-sm' },
+    { id: 'work', label: '💼 お仕事', activeClass: 'bg-emerald-600 text-white shadow-sm' },
+    { id: 'life', label: '🏡 家事・子育て', activeClass: 'bg-amber-500 text-white shadow-sm' },
+    { id: 'care', label: '🌿 整理・息抜き', activeClass: 'bg-sky-600 text-white shadow-sm' },
   ];
 
   return (
     <div
       onPaste={handlePastePhoto}
-      className="w-full h-full min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y bg-white text-slate-900"
+      className="w-full h-full min-h-0 overflow-y-scroll overflow-x-hidden touch-pan-y bg-white text-slate-900"
     >
-      <div className="min-h-full flex flex-col">
+      <div className="min-h-[calc(100%+1px)] flex flex-col">
         {/* 1段目：内部チャットモデル切替 ＋ メモ・履歴・設定 */}
-        <div className="flex flex-wrap items-center justify-between gap-1.5 px-2 py-1.5 sm:px-2.5 sm:py-2 bg-slate-100 border-b border-slate-200">
-          <div className="flex items-center gap-1 bg-slate-200/80 p-1 rounded-xl flex-wrap">
+        <div className="flex flex-wrap items-center justify-between gap-1 px-1.5 py-1 bg-slate-100 border-b border-slate-200">
+          <div className="flex items-center gap-0.5 bg-slate-200/80 p-0.5 rounded-lg flex-wrap">
             {providerTabs.map((tab) => (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setProvider(tab.id)}
-                className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-bold transition shrink-0 ${
+                className={`px-1.5 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold transition shrink-0 ${
                   provider === tab.id ? `${tab.color} shadow-sm` : 'text-slate-600 hover:bg-slate-300/60'
                 }`}
               >
@@ -682,12 +682,12 @@ export const RightAIChatPanel: React.FC<Props> = ({
             ))}
           </div>
 
-          <div className="flex items-center gap-1 flex-wrap">
+          <div className="flex items-center gap-1 flex-wrap pr-1">
             {onToggleMemo && (
               <button
                 type="button"
                 onClick={onToggleMemo}
-                className={`px-2 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold border transition shrink-0 ${
+                className={`px-1.5 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold border transition shrink-0 ${
                   memoOpen
                     ? 'bg-amber-500 text-white border-amber-500'
                     : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
@@ -699,20 +699,20 @@ export const RightAIChatPanel: React.FC<Props> = ({
             <button
               type="button"
               onClick={() => setMessages([])}
-              className="px-2 py-1.5 rounded-lg text-[11px] sm:text-xs text-slate-600 hover:bg-slate-200 shrink-0"
+              className="px-1.5 py-0.5 rounded-md text-[10px] sm:text-[11px] text-slate-600 hover:bg-slate-200 shrink-0"
             >
-              履歴クリア
+              クリア
             </button>
             <button
               type="button"
               onClick={() => setShowSettings(!showSettings)}
-              className={`px-2 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold border transition shrink-0 ${
+              className={`px-1.5 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold border transition shrink-0 ${
                 showSettings
                   ? 'bg-slate-800 text-white border-slate-800'
                   : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
               }`}
             >
-              🔑 接続・モデル設定
+              🔑 接続設定
             </button>
           </div>
         </div>
@@ -720,30 +720,30 @@ export const RightAIChatPanel: React.FC<Props> = ({
         {/* 2段目：カテゴリ別ポップアップランチャーバー */}
         <div
           ref={launcherBarRef}
-          className="relative px-2 py-1.5 sm:px-2.5 bg-slate-50 border-b border-slate-200 flex items-center gap-1.5 flex-wrap text-[11px] sm:text-xs"
+          className="relative px-1.5 py-1 bg-slate-50 border-b border-slate-200 flex items-center gap-1 flex-wrap text-[10px] sm:text-[11px]"
         >
           <button
             type="button"
             onClick={() => toggleLauncher('ai')}
-            className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center gap-1 shadow-sm shrink-0"
+            className="px-1.5 py-0.5 rounded-md bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center gap-0.5 shadow-sm shrink-0"
           >
             <span>🤖</span>
-            <span>人工知能</span>
+            <span>AI</span>
           </button>
 
           <button
             type="button"
             onClick={() => toggleLauncher('video')}
-            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+            className="px-1.5 py-0.5 rounded-md bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-0.5 shadow-sm shrink-0"
           >
             <span>🎬</span>
-            <span>映像サブスク</span>
+            <span>映像</span>
           </button>
 
           <button
             type="button"
             onClick={() => toggleLauncher('news')}
-            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+            className="px-1.5 py-0.5 rounded-md bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-0.5 shadow-sm shrink-0"
           >
             <span>📰</span>
             <span>ニュース</span>
@@ -752,7 +752,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
           <button
             type="button"
             onClick={() => toggleLauncher('books')}
-            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+            className="px-1.5 py-0.5 rounded-md bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-0.5 shadow-sm shrink-0"
           >
             <span>📚</span>
             <span>書籍</span>
@@ -761,7 +761,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
           <button
             type="button"
             onClick={() => toggleLauncher('radio')}
-            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+            className="px-1.5 py-0.5 rounded-md bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-0.5 shadow-sm shrink-0"
           >
             <span>📻</span>
             <span>ラジオ</span>
@@ -770,16 +770,16 @@ export const RightAIChatPanel: React.FC<Props> = ({
           <button
             type="button"
             onClick={() => toggleLauncher('transit')}
-            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+            className="px-1.5 py-0.5 rounded-md bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-0.5 shadow-sm shrink-0"
           >
             <span>🚆</span>
-            <span>乗り換え</span>
+            <span>乗換</span>
           </button>
 
           <button
             type="button"
             onClick={() => toggleLauncher('weather')}
-            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+            className="px-1.5 py-0.5 rounded-md bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-0.5 shadow-sm shrink-0"
           >
             <span>🌤️</span>
             <span>天気</span>
@@ -788,29 +788,29 @@ export const RightAIChatPanel: React.FC<Props> = ({
           <button
             type="button"
             onClick={() => toggleLauncher('daily')}
-            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+            className="px-1.5 py-0.5 rounded-md bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-0.5 shadow-sm shrink-0"
           >
             <span>🛒</span>
-            <span>日常ツール</span>
+            <span>日常</span>
           </button>
 
           <button
             type="button"
             onClick={() => toggleLauncher('music')}
-            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+            className="px-1.5 py-0.5 rounded-md bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-0.5 shadow-sm shrink-0"
           >
             <span>🎵</span>
-            <span>音楽サブスク</span>
+            <span>音楽</span>
           </button>
 
           <button
             type="button"
             onClick={() => toggleLauncher('google')}
-            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+            className="px-1.5 py-0.5 rounded-md bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-0.5 shadow-sm shrink-0"
             title="Google サービス一覧"
           >
-            <span className="text-sm leading-none">⠿</span>
-            <span>Googleアプリ</span>
+            <span className="text-xs leading-none">⠿</span>
+            <span>Google</span>
           </button>
 
           {openLauncher === 'ai' && renderGridPopup('🤖 外部 AI サービス', EXTERNAL_AI_APPS, false)}
@@ -828,25 +828,25 @@ export const RightAIChatPanel: React.FC<Props> = ({
 
         {/* APIキー設定パネル */}
         {showSettings && (
-          <div className="p-2.5 sm:p-3 bg-slate-50 border-b border-slate-300 space-y-2.5 text-xs">
-            <div className="flex items-center justify-between gap-2 flex-wrap">
-              <div className="font-bold text-xs sm:text-sm text-slate-800">
-                AIのAPIキー・モデル設定（使いたいAIを1つ入れるだけでOK）
+          <div className="p-2 bg-slate-50 border-b border-slate-300 space-y-2 text-xs">
+            <div className="flex items-center justify-between gap-1.5 flex-wrap">
+              <div className="font-bold text-xs text-slate-800">
+                APIキー・モデル設定（1つ入力でOK）
               </div>
               <button
                 type="button"
                 onClick={() => setShowRawKeys((prev) => !prev)}
-                className="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-[11px] font-bold text-slate-700 shrink-0"
+                className="px-2 py-0.5 rounded-md bg-white border border-slate-300 hover:bg-slate-100 text-[10px] font-bold text-slate-700 shrink-0"
               >
-                {showRawKeys ? '🙈 キーを隠す' : '👁️ キーを表示して確認'}
+                {showRawKeys ? '🙈 隠す' : '👁️ 表示'}
               </button>
             </div>
 
-            <div className="space-y-2 p-2.5 bg-white rounded-xl border-2 border-emerald-300">
-              <div className="font-bold text-emerald-700">★ ChatGPT 設定（メイン利用）</div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="space-y-1.5 p-2 bg-white rounded-xl border-2 border-emerald-300">
+              <div className="font-bold text-emerald-700 text-[11px]">★ ChatGPT 設定</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                 <div>
-                  <label className="font-bold text-slate-600 block mb-1">ChatGPT APIキー</label>
+                  <label className="font-bold text-slate-600 block mb-0.5 text-[11px]">ChatGPT APIキー</label>
                   <input
                     type={showRawKeys ? 'text' : 'password'}
                     autoComplete="off"
@@ -855,15 +855,15 @@ export const RightAIChatPanel: React.FC<Props> = ({
                     onChange={(e) => setSettings({ ...settings, chatgptKey: e.target.value })}
                     onPaste={(e) => handleKeyPaste('chatgptKey', e)}
                     placeholder="sk-..."
-                    className="w-full px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
+                    className="w-full px-2 py-1 border rounded-lg font-mono text-[16px]"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-600 block mb-1">ChatGPT モデル選択</label>
+                  <label className="font-bold text-slate-600 block mb-0.5 text-[11px]">モデル選択</label>
                   <select
                     value={settings.chatgptModel}
                     onChange={(e) => setSettings({ ...settings, chatgptModel: e.target.value })}
-                    className="w-full px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
+                    className="w-full px-2 py-1 border rounded-lg bg-white text-[16px]"
                   >
                     <option value="gpt-4o">gpt-4o（万能・画像読取OK）</option>
                     <option value="gpt-4o-mini">gpt-4o-mini（高速・低コスト）</option>
@@ -875,22 +875,22 @@ export const RightAIChatPanel: React.FC<Props> = ({
                 </div>
               </div>
               <div>
-                <label className="font-bold text-slate-600 block mb-1">
-                  カスタムモデル名（任意・手入力で最新モデルを指定）
+                <label className="font-bold text-slate-600 block mb-0.5 text-[11px]">
+                  カスタムモデル名（任意）
                 </label>
                 <input
                   type="text"
                   value={settings.chatgptCustomModel}
                   onChange={(e) => setSettings({ ...settings, chatgptCustomModel: e.target.value })}
-                  placeholder="例：gpt-5.4-pro や gpt-4.5-preview（空欄なら上の選択を使用）"
-                  className="w-full px-2.5 py-1.5 border rounded-lg text-[16px]"
+                  placeholder="例：gpt-5.4-pro（空欄なら上の選択を使用）"
+                  className="w-full px-2 py-1 border rounded-lg text-[16px]"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 bg-white rounded-xl border border-slate-200">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 p-2 bg-white rounded-xl border border-slate-200">
               <div>
-                <label className="font-bold text-blue-700 block mb-1">Gemini APIキー（任意）</label>
+                <label className="font-bold text-blue-700 block mb-0.5 text-[11px]">Gemini APIキー（任意）</label>
                 <input
                   type={showRawKeys ? 'text' : 'password'}
                   autoComplete="off"
@@ -899,15 +899,15 @@ export const RightAIChatPanel: React.FC<Props> = ({
                   onChange={(e) => setSettings({ ...settings, geminiKey: e.target.value })}
                   onPaste={(e) => handleKeyPaste('geminiKey', e)}
                   placeholder="AIzaSy..."
-                  className="w-full px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
+                  className="w-full px-2 py-1 border rounded-lg font-mono text-[16px]"
                 />
               </div>
               <div>
-                <label className="font-bold text-slate-600 block mb-1">Gemini モデル</label>
+                <label className="font-bold text-slate-600 block mb-0.5 text-[11px]">Gemini モデル</label>
                 <select
                   value={settings.geminiModel}
                   onChange={(e) => setSettings({ ...settings, geminiModel: e.target.value })}
-                  className="w-full px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
+                  className="w-full px-2 py-1 border rounded-lg bg-white text-[16px]"
                 >
                   <option value="gemini-2.5-flash">gemini-2.5-flash</option>
                   <option value="gemini-2.5-pro">gemini-2.5-pro</option>
@@ -915,9 +915,9 @@ export const RightAIChatPanel: React.FC<Props> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 bg-white rounded-xl border border-slate-200">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 p-2 bg-white rounded-xl border border-slate-200">
               <div>
-                <label className="font-bold text-teal-700 block mb-1">Perplexity APIキー（任意）</label>
+                <label className="font-bold text-teal-700 block mb-0.5 text-[11px]">Perplexity APIキー（任意）</label>
                 <input
                   type={showRawKeys ? 'text' : 'password'}
                   autoComplete="off"
@@ -926,15 +926,15 @@ export const RightAIChatPanel: React.FC<Props> = ({
                   onChange={(e) => setSettings({ ...settings, perplexityKey: e.target.value })}
                   onPaste={(e) => handleKeyPaste('perplexityKey', e)}
                   placeholder="pplx-..."
-                  className="w-full px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
+                  className="w-full px-2 py-1 border rounded-lg font-mono text-[16px]"
                 />
               </div>
               <div>
-                <label className="font-bold text-slate-600 block mb-1">Perplexity モデル</label>
+                <label className="font-bold text-slate-600 block mb-0.5 text-[11px]">Perplexity モデル</label>
                 <select
                   value={settings.perplexityModel}
                   onChange={(e) => setSettings({ ...settings, perplexityModel: e.target.value })}
-                  className="w-full px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
+                  className="w-full px-2 py-1 border rounded-lg bg-white text-[16px]"
                 >
                   <option value="sonar-pro">sonar-pro（検索強化）</option>
                   <option value="sonar">sonar（高速検索）</option>
@@ -942,9 +942,9 @@ export const RightAIChatPanel: React.FC<Props> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 bg-white rounded-xl border border-slate-200">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 p-2 bg-white rounded-xl border border-slate-200">
               <div>
-                <label className="font-bold text-amber-700 block mb-1">Claude APIキー（任意）</label>
+                <label className="font-bold text-amber-700 block mb-0.5 text-[11px]">Claude APIキー（任意）</label>
                 <input
                   type={showRawKeys ? 'text' : 'password'}
                   autoComplete="off"
@@ -953,15 +953,15 @@ export const RightAIChatPanel: React.FC<Props> = ({
                   onChange={(e) => setSettings({ ...settings, claudeKey: e.target.value })}
                   onPaste={(e) => handleKeyPaste('claudeKey', e)}
                   placeholder="sk-ant-..."
-                  className="w-full px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
+                  className="w-full px-2 py-1 border rounded-lg font-mono text-[16px]"
                 />
               </div>
               <div>
-                <label className="font-bold text-slate-600 block mb-1">Claude モデル</label>
+                <label className="font-bold text-slate-600 block mb-0.5 text-[11px]">Claude モデル</label>
                 <select
                   value={settings.claudeModel}
                   onChange={(e) => setSettings({ ...settings, claudeModel: e.target.value })}
-                  className="w-full px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
+                  className="w-full px-2 py-1 border rounded-lg bg-white text-[16px]"
                 >
                   <option value="claude-sonnet-4-5">claude-sonnet-4-5</option>
                   <option value="claude-opus-4-1">claude-opus-4-1</option>
@@ -969,9 +969,9 @@ export const RightAIChatPanel: React.FC<Props> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 bg-white rounded-xl border border-slate-200">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 p-2 bg-white rounded-xl border border-slate-200">
               <div>
-                <label className="font-bold text-indigo-700 block mb-1">Copilot / GitHub Models キー（任意）</label>
+                <label className="font-bold text-indigo-700 block mb-0.5 text-[11px]">Copilot キー（任意）</label>
                 <input
                   type={showRawKeys ? 'text' : 'password'}
                   autoComplete="off"
@@ -980,15 +980,15 @@ export const RightAIChatPanel: React.FC<Props> = ({
                   onChange={(e) => setSettings({ ...settings, copilotKey: e.target.value })}
                   onPaste={(e) => handleKeyPaste('copilotKey', e)}
                   placeholder="ghp_... または github_pat_..."
-                  className="w-full px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
+                  className="w-full px-2 py-1 border rounded-lg font-mono text-[16px]"
                 />
               </div>
               <div>
-                <label className="font-bold text-slate-600 block mb-1">Copilot モデル</label>
+                <label className="font-bold text-slate-600 block mb-0.5 text-[11px]">Copilot モデル</label>
                 <select
                   value={settings.copilotModel}
                   onChange={(e) => setSettings({ ...settings, copilotModel: e.target.value })}
-                  className="w-full px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
+                  className="w-full px-2 py-1 border rounded-lg bg-white text-[16px]"
                 >
                   <option value="gpt-4o">gpt-4o</option>
                   <option value="gpt-4.1">gpt-4.1</option>
@@ -996,12 +996,12 @@ export const RightAIChatPanel: React.FC<Props> = ({
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-1">
+            <div className="flex items-center justify-end gap-2 pt-0.5">
               {savedNotice && <span className="text-emerald-600 font-bold">✓ 保存しました！</span>}
               <button
                 type="button"
                 onClick={handleSaveSettings}
-                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
+                className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
               >
                 設定を保存する
               </button>
@@ -1010,28 +1010,28 @@ export const RightAIChatPanel: React.FC<Props> = ({
         )}
 
         {/* チャット履歴・初期ウェルカム画面 */}
-        <div className="flex-1 px-2.5 sm:px-3.5 py-3 space-y-3.5">
+        <div className="flex-1 px-2 py-2 space-y-2.5">
           {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center text-center px-1 sm:px-2 py-2 space-y-3">
-              <div className="space-y-1 max-w-lg">
-                <div className="inline-block px-3 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold">
-                  お仕事も、暮らしも、これ1つで完結
+            <div className="flex flex-col items-center justify-center text-center px-0.5 py-1 space-y-2">
+              <div className="space-y-0.5 max-w-lg">
+                <div className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold">
+                  お仕事も、暮らしも、1画面で完結
                 </div>
-                <h2 className="text-sm sm:text-lg font-extrabold text-slate-800 leading-snug">
+                <h2 className="text-xs sm:text-base font-extrabold text-slate-800 leading-snug">
                   検索タブだらけの毎日を卒業。
                   <br />
-                  仕事のAIも、暮らしの便利も、寄り添う相棒も1画面に。
+                  仕事のAIも、暮らしの便利も、相棒も1画面に。
                 </h2>
               </div>
 
               {/* カテゴリ切替タブ */}
-              <div className="inline-flex items-center gap-1 p-1 rounded-2xl bg-slate-100 border border-slate-200 flex-wrap justify-center">
+              <div className="inline-flex items-center gap-1 p-0.5 rounded-xl bg-slate-100 border border-slate-200 flex-wrap justify-center">
                 {presetCategoryTabs.map((tab) => (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => setPresetTab(tab.id)}
-                    className={`px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition shrink-0 ${
+                    className={`px-2 py-1 rounded-lg text-[10px] sm:text-[11px] font-bold transition shrink-0 ${
                       presetTab === tab.id
                         ? tab.activeClass
                         : 'text-slate-600 hover:bg-slate-200/70'
@@ -1043,26 +1043,26 @@ export const RightAIChatPanel: React.FC<Props> = ({
               </div>
 
               {/* 選択中カテゴリの6カード */}
-              <div className="w-full max-w-lg grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
+              <div className="w-full max-w-lg grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-left">
                 {activePresets.map((preset) => (
                   <button
                     key={preset.label}
                     type="button"
                     onClick={() => applyPreset(preset.prompt)}
-                    className="p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50/70 border border-slate-200 hover:border-emerald-300 transition flex flex-col justify-center gap-0.5 group"
+                    className="p-2 rounded-xl bg-slate-50 hover:bg-emerald-50/70 border border-slate-200 hover:border-emerald-300 transition flex flex-col justify-center gap-0.5 group"
                   >
-                    <span className="text-xs font-bold text-slate-800 group-hover:text-emerald-800">
+                    <span className="text-[11px] sm:text-xs font-bold text-slate-800 group-hover:text-emerald-800">
                       {preset.label}
                     </span>
-                    <span className="text-[11px] text-slate-500">
+                    <span className="text-[10px] text-slate-500">
                       {preset.desc}
                     </span>
                   </button>
                 ))}
               </div>
 
-              <p className="text-[11px] text-slate-400 px-1">
-                カードを押すと入力欄にテンプレートが入ります。回答後は「メモ」「Gmail」「Outlook」へワンタップ連携。
+              <p className="text-[10px] text-slate-400 px-1">
+                カードを押すと入力欄にテンプレが入ります。回答後はメモ・Gmail・Outlookへ連携。
               </p>
             </div>
           )}
@@ -1070,7 +1070,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
           {messages.map((m, i) => (
             <div key={i} className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
               {m.role === 'assistant' && m.provider && (
-                <span className="text-[11px] font-bold text-slate-400 mb-1 px-1 uppercase">
+                <span className="text-[10px] font-bold text-slate-400 mb-0.5 px-1 uppercase">
                   {m.provider} {m.model ? `(${m.model})` : ''}
                 </span>
               )}
@@ -1078,11 +1078,11 @@ export const RightAIChatPanel: React.FC<Props> = ({
                 <img
                   src={m.photo}
                   alt="添付写真"
-                  className="max-h-40 rounded-xl mb-1.5 border border-slate-200 object-contain"
+                  className="max-h-36 rounded-xl mb-1 border border-slate-200 object-contain"
                 />
               )}
               <div
-                className={`rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
+                className={`rounded-2xl px-3 py-2 text-xs sm:text-sm leading-relaxed whitespace-pre-wrap ${
                   m.role === 'user'
                     ? 'bg-slate-800 text-white'
                     : 'bg-slate-100 text-slate-900 border border-slate-200'
@@ -1090,17 +1090,17 @@ export const RightAIChatPanel: React.FC<Props> = ({
               >
                 {m.text}
                 {m.generatedImage && (
-                  <div className="mt-2.5 space-y-1.5">
+                  <div className="mt-2 space-y-1">
                     <img
                       src={m.generatedImage}
                       alt="生成画像"
-                      className="max-h-80 rounded-xl border border-slate-300 bg-white object-contain"
+                      className="max-h-72 rounded-xl border border-slate-300 bg-white object-contain"
                     />
                     <div>
                       <a
                         href={m.generatedImage}
                         download={`ai-image-${Date.now()}.png`}
-                        className="inline-block text-xs font-bold text-blue-600 hover:underline"
+                        className="inline-block text-[11px] font-bold text-blue-600 hover:underline"
                       >
                         ⬇ 画像を保存する (.png)
                       </a>
@@ -1110,36 +1110,36 @@ export const RightAIChatPanel: React.FC<Props> = ({
               </div>
 
               {m.role === 'assistant' && m.text && (
-                <div className="flex items-center gap-1.5 mt-1.5 px-1 flex-wrap">
+                <div className="flex items-center gap-1 mt-1 px-0.5 flex-wrap">
                   <button
                     type="button"
                     onClick={() => copyReplyText(m.text, i)}
-                    className="text-[11px] font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg border border-slate-200"
+                    className="text-[10px] font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded-md border border-slate-200"
                   >
-                    {copiedIndex === i ? '✓ コピー済み' : '📋 コピー'}
+                    {copiedIndex === i ? '✓ コピー済' : '📋 コピー'}
                   </button>
                   {onSendToMemo && (
                     <button
                       type="button"
                       onClick={() => onSendToMemo(m.text)}
-                      className="text-[11px] font-bold text-amber-800 hover:text-amber-950 bg-amber-100 hover:bg-amber-200 px-2.5 py-1 rounded-lg border border-amber-200"
+                      className="text-[10px] font-bold text-amber-800 hover:text-amber-950 bg-amber-100 hover:bg-amber-200 px-2 py-0.5 rounded-md border border-amber-200"
                     >
-                      📝 メモへ送る
+                      📝 メモへ
                     </button>
                   )}
                   <button
                     type="button"
                     onClick={() => openGmailWithReply(m.text)}
-                    className="text-[11px] font-bold text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-lg border border-rose-200"
+                    className="text-[10px] font-bold text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-2 py-0.5 rounded-md border border-rose-200"
                   >
-                    ✉️ Gmailで送る
+                    ✉️ Gmail
                   </button>
                   <button
                     type="button"
                     onClick={() => openOutlookWithReply(m.text)}
-                    className="text-[11px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200"
+                    className="text-[10px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded-md border border-blue-200"
                   >
-                    📧 Outlookで送る
+                    📧 Outlook
                   </button>
                 </div>
               )}
@@ -1147,30 +1147,30 @@ export const RightAIChatPanel: React.FC<Props> = ({
           ))}
 
           {loading && (
-            <div className="text-xs text-slate-400 animate-pulse">
+            <div className="text-[11px] text-slate-400 animate-pulse">
               {loadingMode === 'image'
-                ? `${provider.toUpperCase()} で画像を生成中（10〜20秒ほどかかります）...`
+                ? `${provider.toUpperCase()} で画像を生成中（10〜20秒ほど）...`
                 : `${provider.toUpperCase()} が考え中...`}
             </div>
           )}
 
           {errorMsg && (
-            <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl p-3">
+            <div className="text-[11px] text-red-600 bg-red-50 border border-red-200 rounded-xl p-2">
               {errorMsg}
             </div>
           )}
         </div>
 
         {photo && (
-          <div className="px-3 py-2 bg-amber-50 border-t border-amber-200 flex items-center justify-between text-xs">
+          <div className="px-2.5 py-1.5 bg-amber-50 border-t border-amber-200 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
-              <img src={photo} alt="選択写真" className="h-9 w-9 rounded object-cover border shrink-0" />
-              <span className="text-amber-900 font-medium">写真を添付中</span>
+              <img src={photo} alt="選択写真" className="h-8 w-8 rounded object-cover border shrink-0" />
+              <span className="text-amber-900 font-medium text-[11px]">写真を添付中</span>
             </div>
             <button
               type="button"
               onClick={() => setPhoto(null)}
-              className="text-amber-700 underline font-bold shrink-0 ml-2"
+              className="text-amber-700 underline font-bold text-[11px] shrink-0 ml-2"
             >
               外す
             </button>
@@ -1178,7 +1178,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
         )}
 
         {/* 入力欄の上：カテゴリ切替つき定型チップバー（横スクロールバー維持） */}
-        <div className="px-2 pt-1.5 pb-1 border-t border-slate-100 bg-slate-50/80 flex items-center gap-1 overflow-x-auto touch-pan-x text-[11px]">
+        <div className="px-1.5 pt-1 pb-1 border-t border-slate-100 bg-slate-50/80 flex items-center gap-1 overflow-x-auto touch-pan-x text-[10px]">
           <button
             type="button"
             onClick={() =>
@@ -1186,7 +1186,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
                 prev === 'work' ? 'life' : prev === 'life' ? 'care' : 'work'
               )
             }
-            className="px-2 py-0.5 rounded-full bg-slate-800 text-white font-bold shrink-0 mr-0.5"
+            className="px-1.5 py-0.5 rounded-full bg-slate-800 text-white font-bold shrink-0"
             title="クリックで定型カテゴリを切替"
           >
             {presetTab === 'work' ? '💼 仕事▾' : presetTab === 'life' ? '🏡 家事育児▾' : '🌿 整理▾'}
@@ -1196,7 +1196,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
               key={preset.label}
               type="button"
               onClick={() => applyPreset(preset.prompt)}
-              className="px-2 py-0.5 rounded-full bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 font-medium shrink-0 transition"
+              className="px-1.5 py-0.5 rounded-full bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 font-medium shrink-0 transition"
             >
               {preset.label}
             </button>
@@ -1204,8 +1204,8 @@ export const RightAIChatPanel: React.FC<Props> = ({
         </div>
 
         {/* 下部入力バー */}
-        <div className="p-2 pt-1.5 pb-8 sm:p-2.5 sm:pt-1.5 bg-white flex items-center gap-1.5">
-          <label className="cursor-pointer px-2 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-[11px] sm:text-xs font-bold text-slate-700 shrink-0">
+        <div className="p-1.5 pb-6 sm:p-2 bg-white flex items-center gap-1">
+          <label className="cursor-pointer px-1.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-[10px] sm:text-xs font-bold text-slate-700 shrink-0">
             📷 写真
             <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
           </label>
@@ -1218,15 +1218,15 @@ export const RightAIChatPanel: React.FC<Props> = ({
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.nativeEvent.isComposing) executeSend('chat');
             }}
-            placeholder={`${provider.toUpperCase()} に質問 / 入力...`}
-            className="flex-1 px-2.5 py-2 rounded-xl border border-slate-300 text-[16px] leading-normal focus:outline-none focus:border-blue-500"
+            placeholder={`${provider.toUpperCase()} に入力...`}
+            className="flex-1 min-w-0 px-2 py-1.5 rounded-xl border border-slate-300 text-[16px] leading-normal focus:outline-none focus:border-blue-500"
           />
 
           <button
             type="button"
             onClick={() => executeSend('image')}
             disabled={loading}
-            className="px-2 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-400 text-white text-[11px] sm:text-xs font-bold shrink-0"
+            className="px-1.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-400 text-white text-[10px] sm:text-xs font-bold shrink-0"
           >
             🎨 画像
           </button>
@@ -1235,7 +1235,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
             type="button"
             onClick={() => executeSend('chat')}
             disabled={loading}
-            className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white text-xs sm:text-sm font-bold shrink-0"
+            className="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white text-[11px] sm:text-xs font-bold shrink-0"
           >
             送信
           </button>
