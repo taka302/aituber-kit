@@ -360,7 +360,6 @@ export const RightAIChatPanel: React.FC<Props> = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
-  const bottomRef = useRef<HTMLDivElement>(null);
   const launcherBarRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -372,10 +371,6 @@ export const RightAIChatPanel: React.FC<Props> = ({
       }
     } catch {}
   }, []);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -390,14 +385,6 @@ export const RightAIChatPanel: React.FC<Props> = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [openLauncher]);
-
-  const resetViewportScroll = () => {
-    setTimeout(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    }, 100);
-  };
 
   const toggleLauncher = (key: LauncherKey) => {
     setOpenLauncher((prev) => (prev === key ? 'none' : key));
@@ -522,7 +509,6 @@ export const RightAIChatPanel: React.FC<Props> = ({
     if (mode === 'chat') setPhoto(null);
     setLoadingMode(mode);
     setLoading(true);
-    resetViewportScroll();
 
     try {
       const res = await fetch('/api/sync-ai', {
@@ -624,13 +610,12 @@ export const RightAIChatPanel: React.FC<Props> = ({
           type="text"
           value={googleSearch}
           onChange={(e) => setGoogleSearch(e.target.value)}
-          onBlur={resetViewportScroll}
           placeholder="サービス名で検索..."
           className="w-full mb-2 px-2 py-1 rounded-lg bg-gray-800 border border-gray-700 text-[16px] text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
         />
       )}
 
-      <div className="grid grid-cols-3 gap-1.5 overflow-y-auto touch-pan-y pr-0.5">
+      <div className="grid grid-cols-3 gap-1.5 overflow-auto touch-auto pr-0.5">
         {items.length > 0 ? (
           items.map((item) => (
             <a
@@ -677,591 +662,584 @@ export const RightAIChatPanel: React.FC<Props> = ({
   return (
     <div
       onPaste={handlePastePhoto}
-      className="min-h-full w-full overflow-auto touch-auto flex flex-col bg-white text-slate-900"
+      className="w-full h-full overflow-auto touch-auto bg-white text-slate-900"
     >
-      {/* 1段目：内部チャットモデル切替 ＋ メモ・履歴・設定 */}
-      <div className="flex flex-wrap items-center justify-between gap-1.5 px-2 py-1.5 sm:px-2.5 sm:py-2 bg-slate-100 border-b border-slate-200">
-        <div className="flex items-center gap-1 bg-slate-200/80 p-1 rounded-xl flex-wrap">
-          {providerTabs.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setProvider(tab.id)}
-              className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-bold transition shrink-0 ${
-                provider === tab.id ? `${tab.color} shadow-sm` : 'text-slate-600 hover:bg-slate-300/60'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+      <div className="min-w-[540px] sm:min-w-0 min-h-full flex flex-col">
+        {/* 1段目：内部チャットモデル切替 ＋ メモ・履歴・設定 */}
+        <div className="flex flex-wrap items-center justify-between gap-1.5 px-2 py-1.5 sm:px-2.5 sm:py-2 bg-slate-100 border-b border-slate-200">
+          <div className="flex items-center gap-1 bg-slate-200/80 p-1 rounded-xl flex-wrap">
+            {providerTabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setProvider(tab.id)}
+                className={`px-2 py-1 rounded-lg text-[11px] sm:text-xs font-bold transition shrink-0 ${
+                  provider === tab.id ? `${tab.color} shadow-sm` : 'text-slate-600 hover:bg-slate-300/60'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-        <div className="flex items-center gap-1 flex-wrap">
-          {onToggleMemo && (
+          <div className="flex items-center gap-1 flex-wrap">
+            {onToggleMemo && (
+              <button
+                type="button"
+                onClick={onToggleMemo}
+                className={`px-2 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold border transition shrink-0 ${
+                  memoOpen
+                    ? 'bg-amber-500 text-white border-amber-500'
+                    : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+                }`}
+              >
+                📝 メモ
+              </button>
+            )}
             <button
               type="button"
-              onClick={onToggleMemo}
+              onClick={() => setMessages([])}
+              className="px-2 py-1.5 rounded-lg text-[11px] sm:text-xs text-slate-600 hover:bg-slate-200 shrink-0"
+            >
+              履歴クリア
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowSettings(!showSettings)}
               className={`px-2 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold border transition shrink-0 ${
-                memoOpen
-                  ? 'bg-amber-500 text-white border-amber-500'
+                showSettings
+                  ? 'bg-slate-800 text-white border-slate-800'
                   : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
               }`}
             >
-              📝 メモ
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => setMessages([])}
-            className="px-2 py-1.5 rounded-lg text-[11px] sm:text-xs text-slate-600 hover:bg-slate-200 shrink-0"
-          >
-            履歴クリア
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowSettings(!showSettings)}
-            className={`px-2 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold border transition shrink-0 ${
-              showSettings
-                ? 'bg-slate-800 text-white border-slate-800'
-                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
-            }`}
-          >
-            🔑 接続・モデル設定
-          </button>
-        </div>
-      </div>
-
-      {/* 2段目：カテゴリ別ポップアップランチャーバー */}
-      <div
-        ref={launcherBarRef}
-        className="relative px-2 py-1.5 sm:px-2.5 bg-slate-50 border-b border-slate-200 flex items-center gap-1.5 flex-wrap text-[11px] sm:text-xs"
-      >
-        <button
-          type="button"
-          onClick={() => toggleLauncher('ai')}
-          className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center gap-1 shadow-sm shrink-0"
-        >
-          <span>🤖</span>
-          <span>人工知能</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => toggleLauncher('video')}
-          className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
-        >
-          <span>🎬</span>
-          <span>映像サブスク</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => toggleLauncher('news')}
-          className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
-        >
-          <span>📰</span>
-          <span>ニュース</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => toggleLauncher('books')}
-          className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
-        >
-          <span>📚</span>
-          <span>書籍</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => toggleLauncher('radio')}
-          className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
-        >
-          <span>📻</span>
-          <span>ラジオ</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => toggleLauncher('transit')}
-          className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
-        >
-          <span>🚆</span>
-          <span>乗り換え</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => toggleLauncher('weather')}
-          className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
-        >
-          <span>🌤️</span>
-          <span>天気</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => toggleLauncher('daily')}
-          className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
-        >
-          <span>🛒</span>
-          <span>日常ツール</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => toggleLauncher('music')}
-          className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
-        >
-          <span>🎵</span>
-          <span>音楽サブスク</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => toggleLauncher('google')}
-          className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
-          title="Google サービス一覧"
-        >
-          <span className="text-sm leading-none">⠿</span>
-          <span>Googleアプリ</span>
-        </button>
-
-        {openLauncher === 'ai' && renderGridPopup('🤖 外部 AI サービス', EXTERNAL_AI_APPS, false)}
-        {openLauncher === 'video' && renderGridPopup('🎬 映像サブスク', VIDEO_APPS, false)}
-        {openLauncher === 'news' && renderGridPopup('📰 ニュース・読み物', NEWS_APPS, false)}
-        {openLauncher === 'books' && renderGridPopup('📚 書籍・電子書籍', BOOK_APPS, false)}
-        {openLauncher === 'radio' && renderGridPopup('📻 ラジオ・音声配信', RADIO_APPS, false)}
-        {openLauncher === 'transit' && renderGridPopup('🚆 乗り換え・地図', TRANSIT_APPS, false)}
-        {openLauncher === 'weather' && renderGridPopup('🌤️ 天気・防災', WEATHER_APPS, false)}
-        {openLauncher === 'daily' && renderGridPopup('🛒 買い物・日常ツール', DAILY_APPS, false)}
-        {openLauncher === 'music' && renderGridPopup('🎵 音楽サブスク', MUSIC_SERVICES, false)}
-        {openLauncher === 'google' &&
-          renderGridPopup('Google サービス', filteredGoogleApps, true)}
-      </div>
-
-      {/* APIキー設定パネル */}
-      {showSettings && (
-        <div className="p-2.5 sm:p-3 bg-slate-50 border-b border-slate-300 space-y-2.5 text-xs overflow-auto touch-auto">
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="font-bold text-xs sm:text-sm text-slate-800">
-              AIのAPIキー・モデル設定（使いたいAIを1つ入れるだけでOK）
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowRawKeys((prev) => !prev)}
-              className="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-[11px] font-bold text-slate-700 shrink-0"
-            >
-              {showRawKeys ? '🙈 キーを隠す' : '👁️ キーを表示して確認'}
+              🔑 接続・モデル設定
             </button>
           </div>
+        </div>
 
-          <div className="space-y-2 p-2.5 bg-white rounded-xl border-2 border-emerald-300">
-            <div className="font-bold text-emerald-700">★ ChatGPT 設定（メイン利用）</div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {/* 2段目：カテゴリ別ポップアップランチャーバー */}
+        <div
+          ref={launcherBarRef}
+          className="relative px-2 py-1.5 sm:px-2.5 bg-slate-50 border-b border-slate-200 flex items-center gap-1.5 flex-wrap text-[11px] sm:text-xs"
+        >
+          <button
+            type="button"
+            onClick={() => toggleLauncher('ai')}
+            className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center gap-1 shadow-sm shrink-0"
+          >
+            <span>🤖</span>
+            <span>人工知能</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => toggleLauncher('video')}
+            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+          >
+            <span>🎬</span>
+            <span>映像サブスク</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => toggleLauncher('news')}
+            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+          >
+            <span>📰</span>
+            <span>ニュース</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => toggleLauncher('books')}
+            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+          >
+            <span>📚</span>
+            <span>書籍</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => toggleLauncher('radio')}
+            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+          >
+            <span>📻</span>
+            <span>ラジオ</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => toggleLauncher('transit')}
+            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+          >
+            <span>🚆</span>
+            <span>乗り換え</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => toggleLauncher('weather')}
+            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+          >
+            <span>🌤️</span>
+            <span>天気</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => toggleLauncher('daily')}
+            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+          >
+            <span>🛒</span>
+            <span>日常ツール</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => toggleLauncher('music')}
+            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+          >
+            <span>🎵</span>
+            <span>音楽サブスク</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => toggleLauncher('google')}
+            className="px-2 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-bold border border-slate-300 flex items-center gap-1 shadow-sm shrink-0"
+            title="Google サービス一覧"
+          >
+            <span className="text-sm leading-none">⠿</span>
+            <span>Googleアプリ</span>
+          </button>
+
+          {openLauncher === 'ai' && renderGridPopup('🤖 外部 AI サービス', EXTERNAL_AI_APPS, false)}
+          {openLauncher === 'video' && renderGridPopup('🎬 映像サブスク', VIDEO_APPS, false)}
+          {openLauncher === 'news' && renderGridPopup('📰 ニュース・読み物', NEWS_APPS, false)}
+          {openLauncher === 'books' && renderGridPopup('📚 書籍・電子書籍', BOOK_APPS, false)}
+          {openLauncher === 'radio' && renderGridPopup('📻 ラジオ・音声配信', RADIO_APPS, false)}
+          {openLauncher === 'transit' && renderGridPopup('🚆 乗り換え・地図', TRANSIT_APPS, false)}
+          {openLauncher === 'weather' && renderGridPopup('🌤️ 天気・防災', WEATHER_APPS, false)}
+          {openLauncher === 'daily' && renderGridPopup('🛒 買い物・日常ツール', DAILY_APPS, false)}
+          {openLauncher === 'music' && renderGridPopup('🎵 音楽サブスク', MUSIC_SERVICES, false)}
+          {openLauncher === 'google' &&
+            renderGridPopup('Google サービス', filteredGoogleApps, true)}
+        </div>
+
+        {/* APIキー設定パネル */}
+        {showSettings && (
+          <div className="p-2.5 sm:p-3 bg-slate-50 border-b border-slate-300 space-y-2.5 text-xs">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <div className="font-bold text-xs sm:text-sm text-slate-800">
+                AIのAPIキー・モデル設定（使いたいAIを1つ入れるだけでOK）
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowRawKeys((prev) => !prev)}
+                className="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-[11px] font-bold text-slate-700 shrink-0"
+              >
+                {showRawKeys ? '🙈 キーを隠す' : '👁️ キーを表示して確認'}
+              </button>
+            </div>
+
+            <div className="space-y-2 p-2.5 bg-white rounded-xl border-2 border-emerald-300">
+              <div className="font-bold text-emerald-700">★ ChatGPT 設定（メイン利用）</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label className="font-bold text-slate-600 block mb-1">ChatGPT APIキー</label>
+                  <input
+                    type={showRawKeys ? 'text' : 'password'}
+                    autoComplete="off"
+                    spellCheck={false}
+                    value={settings.chatgptKey}
+                    onChange={(e) => setSettings({ ...settings, chatgptKey: e.target.value })}
+                    onPaste={(e) => handleKeyPaste('chatgptKey', e)}
+                    placeholder="sk-..."
+                    className="w-full px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-600 block mb-1">ChatGPT モデル選択</label>
+                  <select
+                    value={settings.chatgptModel}
+                    onChange={(e) => setSettings({ ...settings, chatgptModel: e.target.value })}
+                    className="w-full px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
+                  >
+                    <option value="gpt-4o">gpt-4o（万能・画像読取OK）</option>
+                    <option value="gpt-4o-mini">gpt-4o-mini（高速・低コスト）</option>
+                    <option value="gpt-4.1">gpt-4.1（高精度・長文構成）</option>
+                    <option value="gpt-4.1-mini">gpt-4.1-mini（軽量高速）</option>
+                    <option value="o3-mini">o3-mini（推論・論理整理）</option>
+                    <option value="o4-mini">o4-mini（最新推論・画像OK）</option>
+                  </select>
+                </div>
+              </div>
               <div>
-                <label className="font-bold text-slate-600 block mb-1">ChatGPT APIキー</label>
+                <label className="font-bold text-slate-600 block mb-1">
+                  カスタムモデル名（任意・手入力で最新モデルを指定）
+                </label>
+                <input
+                  type="text"
+                  value={settings.chatgptCustomModel}
+                  onChange={(e) => setSettings({ ...settings, chatgptCustomModel: e.target.value })}
+                  placeholder="例：gpt-5.4-pro や gpt-4.5-preview（空欄なら上の選択を使用）"
+                  className="w-full px-2.5 py-1.5 border rounded-lg text-[16px]"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 bg-white rounded-xl border border-slate-200">
+              <div>
+                <label className="font-bold text-blue-700 block mb-1">Gemini APIキー（任意）</label>
                 <input
                   type={showRawKeys ? 'text' : 'password'}
                   autoComplete="off"
                   spellCheck={false}
-                  value={settings.chatgptKey}
-                  onChange={(e) => setSettings({ ...settings, chatgptKey: e.target.value })}
-                  onPaste={(e) => handleKeyPaste('chatgptKey', e)}
-                  onBlur={resetViewportScroll}
-                  placeholder="sk-..."
+                  value={settings.geminiKey}
+                  onChange={(e) => setSettings({ ...settings, geminiKey: e.target.value })}
+                  onPaste={(e) => handleKeyPaste('geminiKey', e)}
+                  placeholder="AIzaSy..."
                   className="w-full px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
                 />
               </div>
               <div>
-                <label className="font-bold text-slate-600 block mb-1">ChatGPT モデル選択</label>
+                <label className="font-bold text-slate-600 block mb-1">Gemini モデル</label>
                 <select
-                  value={settings.chatgptModel}
-                  onChange={(e) => setSettings({ ...settings, chatgptModel: e.target.value })}
+                  value={settings.geminiModel}
+                  onChange={(e) => setSettings({ ...settings, geminiModel: e.target.value })}
                   className="w-full px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
                 >
-                  <option value="gpt-4o">gpt-4o（万能・画像読取OK）</option>
-                  <option value="gpt-4o-mini">gpt-4o-mini（高速・低コスト）</option>
-                  <option value="gpt-4.1">gpt-4.1（高精度・長文構成）</option>
-                  <option value="gpt-4.1-mini">gpt-4.1-mini（軽量高速）</option>
-                  <option value="o3-mini">o3-mini（推論・論理整理）</option>
-                  <option value="o4-mini">o4-mini（最新推論・画像OK）</option>
+                  <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+                  <option value="gemini-2.5-pro">gemini-2.5-pro</option>
                 </select>
               </div>
             </div>
-            <div>
-              <label className="font-bold text-slate-600 block mb-1">
-                カスタムモデル名（任意・手入力で最新モデルを指定）
-              </label>
-              <input
-                type="text"
-                value={settings.chatgptCustomModel}
-                onChange={(e) => setSettings({ ...settings, chatgptCustomModel: e.target.value })}
-                onBlur={resetViewportScroll}
-                placeholder="例：gpt-5.4-pro や gpt-4.5-preview（空欄なら上の選択を使用）"
-                className="w-full px-2.5 py-1.5 border rounded-lg text-[16px]"
-              />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 bg-white rounded-xl border border-slate-200">
-            <div>
-              <label className="font-bold text-blue-700 block mb-1">Gemini APIキー（任意）</label>
-              <input
-                type={showRawKeys ? 'text' : 'password'}
-                autoComplete="off"
-                spellCheck={false}
-                value={settings.geminiKey}
-                onChange={(e) => setSettings({ ...settings, geminiKey: e.target.value })}
-                onPaste={(e) => handleKeyPaste('geminiKey', e)}
-                onBlur={resetViewportScroll}
-                placeholder="AIzaSy..."
-                className="w-full px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
-              />
-            </div>
-            <div>
-              <label className="font-bold text-slate-600 block mb-1">Gemini モデル</label>
-              <select
-                value={settings.geminiModel}
-                onChange={(e) => setSettings({ ...settings, geminiModel: e.target.value })}
-                className="w-full px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
-              >
-                <option value="gemini-2.5-flash">gemini-2.5-flash</option>
-                <option value="gemini-2.5-pro">gemini-2.5-pro</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 bg-white rounded-xl border border-slate-200">
-            <div>
-              <label className="font-bold text-teal-700 block mb-1">Perplexity APIキー（任意）</label>
-              <input
-                type={showRawKeys ? 'text' : 'password'}
-                autoComplete="off"
-                spellCheck={false}
-                value={settings.perplexityKey}
-                onChange={(e) => setSettings({ ...settings, perplexityKey: e.target.value })}
-                onPaste={(e) => handleKeyPaste('perplexityKey', e)}
-                onBlur={resetViewportScroll}
-                placeholder="pplx-..."
-                className="w-full px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
-              />
-            </div>
-            <div>
-              <label className="font-bold text-slate-600 block mb-1">Perplexity モデル</label>
-              <select
-                value={settings.perplexityModel}
-                onChange={(e) => setSettings({ ...settings, perplexityModel: e.target.value })}
-                className="w-full px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
-              >
-                <option value="sonar-pro">sonar-pro（検索強化）</option>
-                <option value="sonar">sonar（高速検索）</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 bg-white rounded-xl border border-slate-200">
-            <div>
-              <label className="font-bold text-amber-700 block mb-1">Claude APIキー（任意）</label>
-              <input
-                type={showRawKeys ? 'text' : 'password'}
-                autoComplete="off"
-                spellCheck={false}
-                value={settings.claudeKey}
-                onChange={(e) => setSettings({ ...settings, claudeKey: e.target.value })}
-                onPaste={(e) => handleKeyPaste('claudeKey', e)}
-                onBlur={resetViewportScroll}
-                placeholder="sk-ant-..."
-                className="w-full px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
-              />
-            </div>
-            <div>
-              <label className="font-bold text-slate-600 block mb-1">Claude モデル</label>
-              <select
-                value={settings.claudeModel}
-                onChange={(e) => setSettings({ ...settings, claudeModel: e.target.value })}
-                className="w-full px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
-              >
-                <option value="claude-sonnet-4-5">claude-sonnet-4-5</option>
-                <option value="claude-opus-4-1">claude-opus-4-1</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 bg-white rounded-xl border border-slate-200">
-            <div>
-              <label className="font-bold text-indigo-700 block mb-1">Copilot / GitHub Models キー（任意）</label>
-              <input
-                type={showRawKeys ? 'text' : 'password'}
-                autoComplete="off"
-                spellCheck={false}
-                value={settings.copilotKey}
-                onChange={(e) => setSettings({ ...settings, copilotKey: e.target.value })}
-                onPaste={(e) => handleKeyPaste('copilotKey', e)}
-                onBlur={resetViewportScroll}
-                placeholder="ghp_... または github_pat_..."
-                className="w-full px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
-              />
-            </div>
-            <div>
-              <label className="font-bold text-slate-600 block mb-1">Copilot モデル</label>
-              <select
-                value={settings.copilotModel}
-                onChange={(e) => setSettings({ ...settings, copilotModel: e.target.value })}
-                className="w-full px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
-              >
-                <option value="gpt-4o">gpt-4o</option>
-                <option value="gpt-4.1">gpt-4.1</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-end gap-2 pt-1">
-            {savedNotice && <span className="text-emerald-600 font-bold">✓ 保存しました！</span>}
-            <button
-              type="button"
-              onClick={handleSaveSettings}
-              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
-            >
-              設定を保存する
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* チャット履歴・初期ウェルカム画面 */}
-      <div className="flex-1 overflow-auto touch-auto px-2.5 sm:px-3.5 py-3 space-y-3.5">
-        {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center text-center px-1 sm:px-2 py-2 space-y-3">
-            <div className="space-y-1 max-w-lg">
-              <div className="inline-block px-3 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold">
-                お仕事も、暮らしも、これ1つで完結
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 bg-white rounded-xl border border-slate-200">
+              <div>
+                <label className="font-bold text-teal-700 block mb-1">Perplexity APIキー（任意）</label>
+                <input
+                  type={showRawKeys ? 'text' : 'password'}
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={settings.perplexityKey}
+                  onChange={(e) => setSettings({ ...settings, perplexityKey: e.target.value })}
+                  onPaste={(e) => handleKeyPaste('perplexityKey', e)}
+                  placeholder="pplx-..."
+                  className="w-full px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
+                />
               </div>
-              <h2 className="text-sm sm:text-lg font-extrabold text-slate-800 leading-snug whitespace-nowrap">
-                検索タブだらけの毎日を卒業。
-                <br />
-                仕事のAIも、暮らしの便利も、寄り添う相棒も1画面に。
-              </h2>
-            </div>
-
-            {/* カテゴリ切替タブ */}
-            <div className="inline-flex items-center gap-1 p-1 rounded-2xl bg-slate-100 border border-slate-200">
-              {presetCategoryTabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setPresetTab(tab.id)}
-                  className={`px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition shrink-0 ${
-                    presetTab === tab.id
-                      ? tab.activeClass
-                      : 'text-slate-600 hover:bg-slate-200/70'
-                  }`}
+              <div>
+                <label className="font-bold text-slate-600 block mb-1">Perplexity モデル</label>
+                <select
+                  value={settings.perplexityModel}
+                  onChange={(e) => setSettings({ ...settings, perplexityModel: e.target.value })}
+                  className="w-full px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
                 >
-                  {tab.label}
-                </button>
-              ))}
+                  <option value="sonar-pro">sonar-pro（検索強化）</option>
+                  <option value="sonar">sonar（高速検索）</option>
+                </select>
+              </div>
             </div>
 
-            {/* 選択中カテゴリの6カード */}
-            <div className="max-w-lg grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
-              {activePresets.map((preset) => (
-                <button
-                  key={preset.label}
-                  type="button"
-                  onClick={() => applyPreset(preset.prompt)}
-                  className="p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50/70 border border-slate-200 hover:border-emerald-300 transition flex flex-col justify-center gap-0.5 group"
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 bg-white rounded-xl border border-slate-200">
+              <div>
+                <label className="font-bold text-amber-700 block mb-1">Claude APIキー（任意）</label>
+                <input
+                  type={showRawKeys ? 'text' : 'password'}
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={settings.claudeKey}
+                  onChange={(e) => setSettings({ ...settings, claudeKey: e.target.value })}
+                  onPaste={(e) => handleKeyPaste('claudeKey', e)}
+                  placeholder="sk-ant-..."
+                  className="w-full px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-slate-600 block mb-1">Claude モデル</label>
+                <select
+                  value={settings.claudeModel}
+                  onChange={(e) => setSettings({ ...settings, claudeModel: e.target.value })}
+                  className="w-full px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
                 >
-                  <span className="text-xs font-bold text-slate-800 group-hover:text-emerald-800">
-                    {preset.label}
-                  </span>
-                  <span className="text-[11px] text-slate-500">
-                    {preset.desc}
-                  </span>
-                </button>
-              ))}
+                  <option value="claude-sonnet-4-5">claude-sonnet-4-5</option>
+                  <option value="claude-opus-4-1">claude-opus-4-1</option>
+                </select>
+              </div>
             </div>
 
-            <p className="text-[11px] text-slate-400 px-1">
-              カードを押すと入力欄にテンプレートが入ります。回答後は「メモ」「Gmail」「Outlook」へワンタップ連携。
-            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 bg-white rounded-xl border border-slate-200">
+              <div>
+                <label className="font-bold text-indigo-700 block mb-1">Copilot / GitHub Models キー（任意）</label>
+                <input
+                  type={showRawKeys ? 'text' : 'password'}
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={settings.copilotKey}
+                  onChange={(e) => setSettings({ ...settings, copilotKey: e.target.value })}
+                  onPaste={(e) => handleKeyPaste('copilotKey', e)}
+                  placeholder="ghp_... または github_pat_..."
+                  className="w-full px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-slate-600 block mb-1">Copilot モデル</label>
+                <select
+                  value={settings.copilotModel}
+                  onChange={(e) => setSettings({ ...settings, copilotModel: e.target.value })}
+                  className="w-full px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
+                >
+                  <option value="gpt-4o">gpt-4o</option>
+                  <option value="gpt-4.1">gpt-4.1</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-1">
+              {savedNotice && <span className="text-emerald-600 font-bold">✓ 保存しました！</span>}
+              <button
+                type="button"
+                onClick={handleSaveSettings}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
+              >
+                設定を保存する
+              </button>
+            </div>
           </div>
         )}
 
-        {messages.map((m, i) => (
-          <div key={i} className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
-            {m.role === 'assistant' && m.provider && (
-              <span className="text-[11px] font-bold text-slate-400 mb-1 px-1 uppercase">
-                {m.provider} {m.model ? `(${m.model})` : ''}
-              </span>
-            )}
-            {m.photo && (
-              <img
-                src={m.photo}
-                alt="添付写真"
-                className="max-h-40 rounded-xl mb-1.5 border border-slate-200 object-contain"
-              />
-            )}
-            <div
-              className={`rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
-                m.role === 'user'
-                  ? 'bg-slate-800 text-white'
-                  : 'bg-slate-100 text-slate-900 border border-slate-200'
-              }`}
-            >
-              {m.text}
-              {m.generatedImage && (
-                <div className="mt-2.5 space-y-1.5">
-                  <img
-                    src={m.generatedImage}
-                    alt="生成画像"
-                    className="max-h-80 rounded-xl border border-slate-300 bg-white object-contain"
-                  />
-                  <div>
-                    <a
-                      href={m.generatedImage}
-                      download={`ai-image-${Date.now()}.png`}
-                      className="inline-block text-xs font-bold text-blue-600 hover:underline"
-                    >
-                      ⬇ 画像を保存する (.png)
-                    </a>
+        {/* チャット履歴・初期ウェルカム画面 */}
+        <div className="flex-1 px-2.5 sm:px-3.5 py-3 space-y-3.5">
+          {messages.length === 0 && (
+            <div className="flex flex-col items-center justify-center text-center px-1 sm:px-2 py-2 space-y-3">
+              <div className="space-y-1 max-w-lg">
+                <div className="inline-block px-3 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold">
+                  お仕事も、暮らしも、これ1つで完結
+                </div>
+                <h2 className="text-sm sm:text-lg font-extrabold text-slate-800 leading-snug whitespace-nowrap">
+                  検索タブだらけの毎日を卒業。
+                  <br />
+                  仕事のAIも、暮らしの便利も、寄り添う相棒も1画面に。
+                </h2>
+              </div>
+
+              {/* カテゴリ切替タブ */}
+              <div className="inline-flex items-center gap-1 p-1 rounded-2xl bg-slate-100 border border-slate-200">
+                {presetCategoryTabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setPresetTab(tab.id)}
+                    className={`px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition shrink-0 ${
+                      presetTab === tab.id
+                        ? tab.activeClass
+                        : 'text-slate-600 hover:bg-slate-200/70'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* 選択中カテゴリの6カード */}
+              <div className="max-w-lg grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
+                {activePresets.map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => applyPreset(preset.prompt)}
+                    className="p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50/70 border border-slate-200 hover:border-emerald-300 transition flex flex-col justify-center gap-0.5 group"
+                  >
+                    <span className="text-xs font-bold text-slate-800 group-hover:text-emerald-800">
+                      {preset.label}
+                    </span>
+                    <span className="text-[11px] text-slate-500">
+                      {preset.desc}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <p className="text-[11px] text-slate-400 px-1">
+                カードを押すと入力欄にテンプレートが入ります。回答後は「メモ」「Gmail」「Outlook」へワンタップ連携。
+              </p>
+            </div>
+          )}
+
+          {messages.map((m, i) => (
+            <div key={i} className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
+              {m.role === 'assistant' && m.provider && (
+                <span className="text-[11px] font-bold text-slate-400 mb-1 px-1 uppercase">
+                  {m.provider} {m.model ? `(${m.model})` : ''}
+                </span>
+              )}
+              {m.photo && (
+                <img
+                  src={m.photo}
+                  alt="添付写真"
+                  className="max-h-40 rounded-xl mb-1.5 border border-slate-200 object-contain"
+                />
+              )}
+              <div
+                className={`rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
+                  m.role === 'user'
+                    ? 'bg-slate-800 text-white'
+                    : 'bg-slate-100 text-slate-900 border border-slate-200'
+                }`}
+              >
+                {m.text}
+                {m.generatedImage && (
+                  <div className="mt-2.5 space-y-1.5">
+                    <img
+                      src={m.generatedImage}
+                      alt="生成画像"
+                      className="max-h-80 rounded-xl border border-slate-300 bg-white object-contain"
+                    />
+                    <div>
+                      <a
+                        href={m.generatedImage}
+                        download={`ai-image-${Date.now()}.png`}
+                        className="inline-block text-xs font-bold text-blue-600 hover:underline"
+                      >
+                        ⬇ 画像を保存する (.png)
+                      </a>
+                    </div>
                   </div>
+                )}
+              </div>
+
+              {m.role === 'assistant' && m.text && (
+                <div className="flex items-center gap-1.5 mt-1.5 px-1 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => copyReplyText(m.text, i)}
+                    className="text-[11px] font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg border border-slate-200"
+                  >
+                    {copiedIndex === i ? '✓ コピー済み' : '📋 コピー'}
+                  </button>
+                  {onSendToMemo && (
+                    <button
+                      type="button"
+                      onClick={() => onSendToMemo(m.text)}
+                      className="text-[11px] font-bold text-amber-800 hover:text-amber-950 bg-amber-100 hover:bg-amber-200 px-2.5 py-1 rounded-lg border border-amber-200"
+                    >
+                      📝 メモへ送る
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => openGmailWithReply(m.text)}
+                    className="text-[11px] font-bold text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-lg border border-rose-200"
+                  >
+                    ✉️ Gmailで送る
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openOutlookWithReply(m.text)}
+                    className="text-[11px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200"
+                  >
+                    📧 Outlookで送る
+                  </button>
                 </div>
               )}
             </div>
+          ))}
 
-            {m.role === 'assistant' && m.text && (
-              <div className="flex items-center gap-1.5 mt-1.5 px-1 flex-wrap">
-                <button
-                  type="button"
-                  onClick={() => copyReplyText(m.text, i)}
-                  className="text-[11px] font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg border border-slate-200"
-                >
-                  {copiedIndex === i ? '✓ コピー済み' : '📋 コピー'}
-                </button>
-                {onSendToMemo && (
-                  <button
-                    type="button"
-                    onClick={() => onSendToMemo(m.text)}
-                    className="text-[11px] font-bold text-amber-800 hover:text-amber-950 bg-amber-100 hover:bg-amber-200 px-2.5 py-1 rounded-lg border border-amber-200"
-                  >
-                    📝 メモへ送る
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => openGmailWithReply(m.text)}
-                  className="text-[11px] font-bold text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-lg border border-rose-200"
-                >
-                  ✉️ Gmailで送る
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openOutlookWithReply(m.text)}
-                  className="text-[11px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200"
-                >
-                  📧 Outlookで送る
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
+          {loading && (
+            <div className="text-xs text-slate-400 animate-pulse">
+              {loadingMode === 'image'
+                ? `${provider.toUpperCase()} で画像を生成中（10〜20秒ほどかかります）...`
+                : `${provider.toUpperCase()} が考え中...`}
+            </div>
+          )}
 
-        {loading && (
-          <div className="text-xs text-slate-400 animate-pulse">
-            {loadingMode === 'image'
-              ? `${provider.toUpperCase()} で画像を生成中（10〜20秒ほどかかります）...`
-              : `${provider.toUpperCase()} が考え中...`}
+          {errorMsg && (
+            <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl p-3">
+              {errorMsg}
+            </div>
+          )}
+        </div>
+
+        {photo && (
+          <div className="px-3 py-2 bg-amber-50 border-t border-amber-200 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <img src={photo} alt="選択写真" className="h-9 w-9 rounded object-cover border shrink-0" />
+              <span className="text-amber-900 font-medium">写真を添付中</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setPhoto(null)}
+              className="text-amber-700 underline font-bold shrink-0 ml-2"
+            >
+              外す
+            </button>
           </div>
         )}
 
-        {errorMsg && (
-          <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-xl p-3">
-            {errorMsg}
-          </div>
-        )}
-
-        <div ref={bottomRef} />
-      </div>
-
-      {photo && (
-        <div className="px-3 py-2 bg-amber-50 border-t border-amber-200 flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2">
-            <img src={photo} alt="選択写真" className="h-9 w-9 rounded object-cover border shrink-0" />
-            <span className="text-amber-900 font-medium">写真を添付中</span>
-          </div>
+        {/* 入力欄の上：カテゴリ切替つき定型チップバー */}
+        <div className="px-2 pt-1.5 pb-1 border-t border-slate-100 bg-slate-50/80 flex items-center gap-1 overflow-auto touch-auto text-[11px]">
           <button
             type="button"
-            onClick={() => setPhoto(null)}
-            className="text-amber-700 underline font-bold shrink-0 ml-2"
+            onClick={() =>
+              setPresetTab((prev) =>
+                prev === 'work' ? 'life' : prev === 'life' ? 'care' : 'work'
+              )
+            }
+            className="px-2 py-0.5 rounded-full bg-slate-800 text-white font-bold shrink-0 mr-0.5"
+            title="クリックで定型カテゴリを切替"
           >
-            外す
+            {presetTab === 'work' ? '💼 仕事▾' : presetTab === 'life' ? '🏡 家事育児▾' : '🌿 整理▾'}
+          </button>
+          {activePresets.map((preset) => (
+            <button
+              key={preset.label}
+              type="button"
+              onClick={() => applyPreset(preset.prompt)}
+              className="px-2 py-0.5 rounded-full bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 font-medium shrink-0 transition"
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+
+        {/* 下部入力バー */}
+        <div className="p-2 pt-1.5 pb-8 sm:p-2.5 sm:pt-1.5 bg-white flex items-center gap-1.5">
+          <label className="cursor-pointer px-2 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-[11px] sm:text-xs font-bold text-slate-700 shrink-0">
+            📷 写真
+            <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
+          </label>
+
+          <input
+            ref={inputRef}
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.nativeEvent.isComposing) executeSend('chat');
+            }}
+            placeholder={`${provider.toUpperCase()} に質問 / 入力...`}
+            className="flex-1 px-2.5 py-2 rounded-xl border border-slate-300 text-[16px] leading-normal focus:outline-none focus:border-blue-500"
+          />
+
+          <button
+            type="button"
+            onClick={() => executeSend('image')}
+            disabled={loading}
+            className="px-2 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-400 text-white text-[11px] sm:text-xs font-bold shrink-0"
+          >
+            🎨 画像
+          </button>
+
+          <button
+            type="button"
+            onClick={() => executeSend('chat')}
+            disabled={loading}
+            className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white text-xs sm:text-sm font-bold shrink-0"
+          >
+            送信
           </button>
         </div>
-      )}
-
-      {/* 入力欄の上：カテゴリ切替つき定型チップバー */}
-      <div className="px-2 pt-1.5 pb-1 border-t border-slate-100 bg-slate-50/80 flex items-center gap-1 overflow-x-auto touch-pan-x text-[11px]">
-        <button
-          type="button"
-          onClick={() =>
-            setPresetTab((prev) =>
-              prev === 'work' ? 'life' : prev === 'life' ? 'care' : 'work'
-            )
-          }
-          className="px-2 py-0.5 rounded-full bg-slate-800 text-white font-bold shrink-0 mr-0.5"
-          title="クリックで定型カテゴリを切替"
-        >
-          {presetTab === 'work' ? '💼 仕事▾' : presetTab === 'life' ? '🏡 家事育児▾' : '🌿 整理▾'}
-        </button>
-        {activePresets.map((preset) => (
-          <button
-            key={preset.label}
-            type="button"
-            onClick={() => applyPreset(preset.prompt)}
-            className="px-2 py-0.5 rounded-full bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 font-medium shrink-0 transition"
-          >
-            {preset.label}
-          </button>
-        ))}
-      </div>
-
-      {/* 下部入力バー */}
-      <div className="p-2 pt-1.5 pb-8 sm:p-2.5 sm:pt-1.5 bg-white flex items-center gap-1.5">
-        <label className="cursor-pointer px-2 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-[11px] sm:text-xs font-bold text-slate-700 shrink-0">
-          📷 写真
-          <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
-        </label>
-
-        <input
-          ref={inputRef}
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onBlur={resetViewportScroll}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.nativeEvent.isComposing) executeSend('chat');
-          }}
-          placeholder={`${provider.toUpperCase()} に質問 / 入力...`}
-          className="flex-1 px-2.5 py-2 rounded-xl border border-slate-300 text-[16px] leading-normal focus:outline-none focus:border-blue-500"
-        />
-
-        <button
-          type="button"
-          onClick={() => executeSend('image')}
-          disabled={loading}
-          className="px-2 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-400 text-white text-[11px] sm:text-xs font-bold shrink-0"
-        >
-          🎨 画像
-        </button>
-
-        <button
-          type="button"
-          onClick={() => executeSend('chat')}
-          disabled={loading}
-          className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white text-xs sm:text-sm font-bold shrink-0"
-        >
-          送信
-        </button>
       </div>
     </div>
   );
