@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-export type AIProvider = 'chatgpt' | 'gemini' | 'perplexity' | 'claude';
+export type AIProvider = 'chatgpt' | 'gemini' | 'perplexity' | 'claude' | 'copilot';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -8,52 +8,23 @@ interface ChatMessage {
 }
 
 const PROMPT_CRAFT_SYSTEM_INSTRUCTION = `あなたは優秀なプロンプト設計エンジニアです。
-ユーザーの短いメモや要望から、Gemini・ChatGPT・Claude・Perplexityや画像生成AIにそのままコピー＆ペーストして使える「作り込まれた完成プロンプト」を作成してください。
+ユーザーの短いメモや要望から、Gemini・ChatGPT・Claude・Perplexity・Copilotや画像生成AIにそのままコピー＆ペーストして使える「作り込まれた完成プロンプト」を作成してください。
 
 【出力ルール】
 1. 最初に「そのままコピーして使える完成プロンプト」を1つのまとまりとして分かりやすく提示する（コードブロックまたは明確な区切り枠を使用）。
 2. 画像・イラスト・風景・図解系の依頼であれば、以下の要素を破綻なく具体的に盛り込む：
-   - 主役・被写体の詳細（人物・服装・表情・動きやポーズ・配置）
-   - 構図・カメラワーク（アングル、距離感、余白、視線の流れ）
-   - 環境・背景・時間帯・光の当たり方
-   - 画風・質感・色合い・空気感
-   - 崩れ防止の指定（余計な文字・透かし・手足の歪み・ごちゃつきを避ける指定）
+  - 主役・被写体の詳細（人物・服装・表情・動きやポーズ・配置）
+  - 構図・カメラワーク（アングル、距離感、余白、視線の流れ）
+  - 環境・背景・時間帯・光の当たり方
+  - 画風・質感・色合い・空気感
+  - 崩れ防止の指定（余計な文字・透かし・手足の歪み・ごちゃつきを避ける指定）
 3. 文章・構成・表・企画・学習・解説系の依頼であれば、以下の要素を明確にする：
-   - 役割（AIにどんな視点で答えてほしいか）
-   - 目的と読者・利用シーン
-   - 入力素材や前提条件（画像添付がある場合は「添付画像の内容をもとに」と明記）
-   - 出力形式（表、箇条書き、ステップ、スライド構成など）とトーン
+  - 役割（AIにどんな視点で答えてほしいか）
+  - 目的と読者・利用シーン
+  - 入力素材や前提条件（画像添付がある場合は「添付画像の内容をもとに」と明記）
+  - 出力形式（表、箇条書き、ステップ、スライド構成など）とトーン
 4. 曖昧な部分があっても、使いやすい実用的な初期設定で補完して「すぐ使える形」に仕上げる。
 5. 最後に、用途に合わせた「ちょっとした調整のコツ（1〜2行）」を添える。`;
-
-async function generateOpenAIImage(apiKey: string, prompt: string): Promise<string> {
-  const res = await fetch('https://api.openai.com/v1/images/generations', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey.trim()}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-image-1',
-      prompt,
-      n: 1,
-      size: '1024x1024',
-    }),
-  });
-
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data?.error?.message || 'OpenAI 画像生成（gpt-image-1）に失敗しました');
-  }
-
-  const item = data?.data?.[0];
-  const img = item?.b64_json ? `data:image/png;base64,${item.b64_json}` : item?.url || null;
-
-  if (!img) {
-    throw new Error('画像データの取得に失敗しました');
-  }
-  return img;
-}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -79,6 +50,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   };
 
   if (!apiKey || !apiKey.trim()) {
+    if (provider === 'copilot') {
+      return res.status(400).json({
+        error:
+          'COPILOT の APIキー（GitHub Models トークン等）が未設定です。Web版 Copilot を直接使う場合は、下の「🤖 人工知能」ボタンから「💠 Copilot」を開いてください。',
+      });
+    }
     return res.status(400).json({
       error: `${provider.toUpperCase()} の APIキーが未設定です。右上の「⚙️ APIキー・モデル」から入力して保存してください。`,
     });
@@ -88,7 +65,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (mode === 'image') {
       return res.status(400).json({
         error:
-          '現在の OpenAI APIキーではアプリ内画像生成モデルが利用できないため、チャットで作り込んだプロンプトを作成し、上部の「✨ Gemini」または「🟢 ChatGPT」から画像を作成してください。',
+          '現在の APIキー設定ではアプリ内画像生成モデルが利用できないため、チャットで作り込んだプロンプトを作成し、上部の「🤖 人工知能」から「✨ Gemini」または「🟢 ChatGPT」を開いて画像を作成してください。',
       });
     }
 
@@ -141,6 +118,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       const replyText = chatData?.choices?.[0]?.message?.content || '';
+      return res.status(200).json({ replyText, speechText: replyText });
+    }
+
+    if (provider === 'copilot') {
+      // GitHub Models / OpenAI互換エンドポイント（GitHub Personal Access Token 等で利用可能）
+      const formattedMessages: any[] = [
+        { role: 'system', content: PROMPT_CRAFT_SYSTEM_INSTRUCTION },
+        ...history.map((h) => ({
+          role: h.role,
+          content: h.text,
+        })),
+        {
+          role: 'user',
+          content:
+            message ||
+            '使いやすい汎用プロンプトのテンプレートを作成してください。',
+        },
+      ];
+
+      const copilotRes = await fetch('https://models.inference.ai.azure.com/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey.trim()}`,
+        },
+        body: JSON.stringify({
+          model: model || 'gpt-4o',
+          messages: formattedMessages,
+        }),
+      });
+
+      const copilotData = await copilotRes.json();
+      if (!copilotRes.ok) {
+        throw new Error(copilotData?.error?.message || 'Copilot (GitHub Models) API エラー');
+      }
+
+      const replyText = copilotData?.choices?.[0]?.message?.content || '';
       return res.status(200).json({ replyText, speechText: replyText });
     }
 
