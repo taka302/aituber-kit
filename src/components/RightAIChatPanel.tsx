@@ -391,6 +391,14 @@ export const RightAIChatPanel: React.FC<Props> = ({
     };
   }, [openLauncher]);
 
+  const resetViewportScroll = () => {
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 100);
+  };
+
   const toggleLauncher = (key: LauncherKey) => {
     setOpenLauncher((prev) => (prev === key ? 'none' : key));
   };
@@ -514,6 +522,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
     if (mode === 'chat') setPhoto(null);
     setLoadingMode(mode);
     setLoading(true);
+    resetViewportScroll();
 
     try {
       const res = await fetch('/api/sync-ai', {
@@ -615,8 +624,9 @@ export const RightAIChatPanel: React.FC<Props> = ({
           type="text"
           value={googleSearch}
           onChange={(e) => setGoogleSearch(e.target.value)}
+          onBlur={resetViewportScroll}
           placeholder="サービス名で検索..."
-          className="w-full mb-2 px-2 py-1 rounded-lg bg-gray-800 border border-gray-700 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
+          className="w-full mb-2 px-2 py-1 rounded-lg bg-gray-800 border border-gray-700 text-[16px] text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
         />
       )}
 
@@ -858,8 +868,9 @@ export const RightAIChatPanel: React.FC<Props> = ({
                   value={settings.chatgptKey}
                   onChange={(e) => setSettings({ ...settings, chatgptKey: e.target.value })}
                   onPaste={(e) => handleKeyPaste('chatgptKey', e)}
+                  onBlur={resetViewportScroll}
                   placeholder="sk-..."
-                  className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg font-mono"
+                  className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
                 />
               </div>
               <div className="min-w-0">
@@ -867,7 +878,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
                 <select
                   value={settings.chatgptModel}
                   onChange={(e) => setSettings({ ...settings, chatgptModel: e.target.value })}
-                  className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg bg-white"
+                  className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
                 >
                   <option value="gpt-4o">gpt-4o（万能・画像読取OK）</option>
                   <option value="gpt-4o-mini">gpt-4o-mini（高速・低コスト）</option>
@@ -886,8 +897,9 @@ export const RightAIChatPanel: React.FC<Props> = ({
                 type="text"
                 value={settings.chatgptCustomModel}
                 onChange={(e) => setSettings({ ...settings, chatgptCustomModel: e.target.value })}
+                onBlur={resetViewportScroll}
                 placeholder="例：gpt-5.4-pro や gpt-4.5-preview（空欄なら上の選択を使用）"
-                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg"
+                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg text-[16px]"
               />
             </div>
           </div>
@@ -902,8 +914,9 @@ export const RightAIChatPanel: React.FC<Props> = ({
                 value={settings.geminiKey}
                 onChange={(e) => setSettings({ ...settings, geminiKey: e.target.value })}
                 onPaste={(e) => handleKeyPaste('geminiKey', e)}
+                onBlur={resetViewportScroll}
                 placeholder="AIzaSy..."
-                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg font-mono"
+                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
               />
             </div>
             <div className="min-w-0">
@@ -911,7 +924,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
               <select
                 value={settings.geminiModel}
                 onChange={(e) => setSettings({ ...settings, geminiModel: e.target.value })}
-                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg bg-white"
+                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
               >
                 <option value="gemini-2.5-flash">gemini-2.5-flash</option>
                 <option value="gemini-2.5-pro">gemini-2.5-pro</option>
@@ -929,8 +942,9 @@ export const RightAIChatPanel: React.FC<Props> = ({
                 value={settings.perplexityKey}
                 onChange={(e) => setSettings({ ...settings, perplexityKey: e.target.value })}
                 onPaste={(e) => handleKeyPaste('perplexityKey', e)}
+                onBlur={resetViewportScroll}
                 placeholder="pplx-..."
-                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg font-mono"
+                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
               />
             </div>
             <div className="min-w-0">
@@ -938,7 +952,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
               <select
                 value={settings.perplexityModel}
                 onChange={(e) => setSettings({ ...settings, perplexityModel: e.target.value })}
-                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg bg-white"
+                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
               >
                 <option value="sonar-pro">sonar-pro（検索強化）</option>
                 <option value="sonar">sonar（高速検索）</option>
@@ -956,8 +970,9 @@ export const RightAIChatPanel: React.FC<Props> = ({
                 value={settings.claudeKey}
                 onChange={(e) => setSettings({ ...settings, claudeKey: e.target.value })}
                 onPaste={(e) => handleKeyPaste('claudeKey', e)}
+                onBlur={resetViewportScroll}
                 placeholder="sk-ant-..."
-                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg font-mono"
+                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
               />
             </div>
             <div className="min-w-0">
@@ -965,7 +980,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
               <select
                 value={settings.claudeModel}
                 onChange={(e) => setSettings({ ...settings, claudeModel: e.target.value })}
-                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg bg-white"
+                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
               >
                 <option value="claude-sonnet-4-5">claude-sonnet-4-5</option>
                 <option value="claude-opus-4-1">claude-opus-4-1</option>
@@ -983,8 +998,9 @@ export const RightAIChatPanel: React.FC<Props> = ({
                 value={settings.copilotKey}
                 onChange={(e) => setSettings({ ...settings, copilotKey: e.target.value })}
                 onPaste={(e) => handleKeyPaste('copilotKey', e)}
+                onBlur={resetViewportScroll}
                 placeholder="ghp_... または github_pat_..."
-                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg font-mono"
+                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg font-mono text-[16px]"
               />
             </div>
             <div className="min-w-0">
@@ -992,7 +1008,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
               <select
                 value={settings.copilotModel}
                 onChange={(e) => setSettings({ ...settings, copilotModel: e.target.value })}
-                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg bg-white"
+                className="w-full min-w-0 px-2.5 py-1.5 border rounded-lg bg-white text-[16px]"
               >
                 <option value="gpt-4o">gpt-4o</option>
                 <option value="gpt-4.1">gpt-4.1</option>
@@ -1209,7 +1225,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
         ))}
       </div>
 
-      {/* 下部入力バー（スマホ下部バーと重なりにくい余白 pb-6 / sm:pb-2.5 付き） */}
+      {/* 下部入力バー（スマホズーム防止 text-[16px] ＋ フォーカス解除時の位置戻し ＋ 下部余白） */}
       <div className="p-2 pt-1.5 pb-6 sm:p-2.5 sm:pt-1.5 bg-white flex items-center gap-1.5 min-w-0">
         <label className="cursor-pointer px-2 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-[11px] sm:text-xs font-bold text-slate-700 shrink-0">
           📷 写真
@@ -1221,11 +1237,12 @@ export const RightAIChatPanel: React.FC<Props> = ({
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onBlur={resetViewportScroll}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.nativeEvent.isComposing) executeSend('chat');
           }}
           placeholder={`${provider.toUpperCase()} に質問 / 入力...`}
-          className="flex-1 min-w-0 px-2.5 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm focus:outline-none focus:border-blue-500"
+          className="flex-1 min-w-0 px-2.5 py-2 rounded-xl border border-slate-300 text-[16px] leading-normal focus:outline-none focus:border-blue-500"
         />
 
         <button
