@@ -662,9 +662,9 @@ export const RightAIChatPanel: React.FC<Props> = ({
   return (
     <div
       onPaste={handlePastePhoto}
-      className="w-full h-full overflow-auto touch-auto bg-white text-slate-900"
+      className="w-full h-full min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y bg-white text-slate-900"
     >
-      <div className="min-w-[540px] sm:min-w-0 min-h-full flex flex-col">
+      <div className="min-h-full flex flex-col">
         {/* 1段目：内部チャットモデル切替 ＋ メモ・履歴・設定 */}
         <div className="flex flex-wrap items-center justify-between gap-1.5 px-2 py-1.5 sm:px-2.5 sm:py-2 bg-slate-100 border-b border-slate-200">
           <div className="flex items-center gap-1 bg-slate-200/80 p-1 rounded-xl flex-wrap">
@@ -1017,7 +1017,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
                 <div className="inline-block px-3 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold">
                   お仕事も、暮らしも、これ1つで完結
                 </div>
-                <h2 className="text-sm sm:text-lg font-extrabold text-slate-800 leading-snug whitespace-nowrap">
+                <h2 className="text-sm sm:text-lg font-extrabold text-slate-800 leading-snug">
                   検索タブだらけの毎日を卒業。
                   <br />
                   仕事のAIも、暮らしの便利も、寄り添う相棒も1画面に。
@@ -1025,7 +1025,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
               </div>
 
               {/* カテゴリ切替タブ */}
-              <div className="inline-flex items-center gap-1 p-1 rounded-2xl bg-slate-100 border border-slate-200">
+              <div className="inline-flex items-center gap-1 p-1 rounded-2xl bg-slate-100 border border-slate-200 flex-wrap justify-center">
                 {presetCategoryTabs.map((tab) => (
                   <button
                     key={tab.id}
@@ -1043,7 +1043,7 @@ export const RightAIChatPanel: React.FC<Props> = ({
               </div>
 
               {/* 選択中カテゴリの6カード */}
-              <div className="max-w-lg grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
+              <div className="w-full max-w-lg grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
                 {activePresets.map((preset) => (
                   <button
                     key={preset.label}
@@ -1177,8 +1177,8 @@ export const RightAIChatPanel: React.FC<Props> = ({
           </div>
         )}
 
-        {/* 入力欄の上：カテゴリ切替つき定型チップバー */}
-        <div className="px-2 pt-1.5 pb-1 border-t border-slate-100 bg-slate-50/80 flex items-center gap-1 overflow-auto touch-auto text-[11px]">
+        {/* 入力欄の上：カテゴリ切替つき定型チップバー（横スクロールバー維持） */}
+        <div className="px-2 pt-1.5 pb-1 border-t border-slate-100 bg-slate-50/80 flex items-center gap-1 overflow-x-auto touch-pan-x text-[11px]">
           <button
             type="button"
             onClick={() =>

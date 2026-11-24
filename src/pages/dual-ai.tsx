@@ -102,7 +102,7 @@ export default function DualAIPage() {
       <section
         className={`${
           mobilePane === 'workspace' ? 'flex-1' : 'hidden'
-        } lg:flex lg:h-full w-full flex-col bg-slate-100 lg:border-l border-slate-300 overflow-hidden min-h-0`}
+        } lg:flex lg:h-full w-full flex-col bg-slate-100 lg:border-l border-slate-300 overflow-x-hidden min-h-0`}
       >
         {statusMessage && (
           <div className="px-3 py-1.5 bg-emerald-50 border-b border-emerald-200 text-[11px] font-bold text-emerald-800 shrink-0">
@@ -110,7 +110,7 @@ export default function DualAIPage() {
           </div>
         )}
 
-        <div className="flex-1 min-h-0 overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
           <RightAIChatPanel
             onSendToMemo={handleAppendToMemo}
             onToggleMemo={() => setMemoOpen((prev) => !prev)}
